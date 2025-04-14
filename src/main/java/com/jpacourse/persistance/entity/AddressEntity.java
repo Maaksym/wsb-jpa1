@@ -2,9 +2,6 @@ package com.jpacourse.persistance.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
-
 @Entity
 @Table(name = "address")
 public class AddressEntity {
@@ -12,33 +9,18 @@ public class AddressEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "city")
-	private String city;
-
-	@Column(name = "addressLine1") // <- wymusza kolumnę o nazwie "addressLine1"
 	private String addressLine1;
-
-	@Column(name = "addressLine2")
 	private String addressLine2;
-
-	@Column(name = "postalCode")
+	private String city;
 	private String postalCode;
 
-	// Getters and Setters
+	// Гетери та сетери
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
 	}
 
 	public String getAddressLine1() {
@@ -55,6 +37,14 @@ public class AddressEntity {
 
 	public void setAddressLine2(String addressLine2) {
 		this.addressLine2 = addressLine2;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	public String getPostalCode() {

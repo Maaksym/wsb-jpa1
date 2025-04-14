@@ -6,6 +6,7 @@ import com.jpacourse.persistance.enums.TreatmentType;
 @Entity
 @Table(name = "medical_treatment")
 public class MedicalTreatmentEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -13,7 +14,12 @@ public class MedicalTreatmentEntity {
 	private String description;
 	private String type;
 
-	// Getters and Setters
+	// Додаємо метод getName() — використаємо опис як "назву"
+	public String getName() {
+		return description;
+	}
+
+	// Стандартні гетери/сетери
 	public Long getId() {
 		return id;
 	}

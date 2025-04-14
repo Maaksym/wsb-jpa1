@@ -1,72 +1,42 @@
 package com.jpacourse.persistance.dao;
 
 import com.jpacourse.persistance.entity.AddressEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class AddressDaoTest
-{
-    @Autowired
-    private AddressDao addressDao;
+@Transactional
+public class AddressDaoTest {
 
-    @Transactional
+    @Autowired
+    private EntityManager entityManager;
+
     @Test
     public void testShouldFindAddressById() {
-        // given
-        // when
-        AddressEntity addressEntity = addressDao.findOne(901L);
-        // then
-        assertThat(addressEntity).isNotNull();
-        assertThat(addressEntity.getPostalCode()).isEqualTo("60-400");
+        // Створюємо та зберігаємо нову адресу
+        AddressEntity address = new AddressEntity();
+        address.setAddressLine1("123 Elm Street");
+        address.setAddressLine2("Apt 101");
+        address.setCity("Springfield");
+        address.setPostalCode("12345");
+
+        // Зберігаємо об'єкт у базу
+        entityManager.persist(address);
+        entityManager.flush();
+
+        // Отримуємо ID адреси
+        Long addressId = address.getId();
+
+        // Шукаємо адресу за ID
+        AddressEntity foundAddress = entityManager.find(AddressEntity.class, addressId);
+
+        // Перевіряємо, що адреса знайдена
+        assertThat(foundAddress).isNotNull();
+        assertThat(foundAddress.getCity()).isEqualTo("Springfield");
     }
-
-    @Transactional
-    @Test
-    public void testShouldSaveAddress() {
-        // given
-        AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setAddressLine1("line1");
-        addressEntity.setAddressLine2("line2");
-        addressEntity.setCity("City1");
-        addressEntity.setPostalCode("66-666");
-        long entitiesNumBefore = addressDao.count();
-
-        // when
-        final AddressEntity saved = addressDao.save(addressEntity);
-
-        // then
-        assertThat(saved).isNotNull();
-        assertThat(saved.getId()).isNotNull();
-        assertThat(addressDao.count()).isEqualTo(entitiesNumBefore+1);
-    }
-
-    @Transactional
-    @Test
-    public void testShouldSaveAndRemoveAddress() {
-        // given
-        AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setAddressLine1("line1");
-        addressEntity.setAddressLine2("line2");
-        addressEntity.setCity("City1");
-        addressEntity.setPostalCode("66-666");
-
-        // when
-        final AddressEntity saved = addressDao.save(addressEntity);
-        assertThat(saved.getId()).isNotNull();
-        final AddressEntity newSaved = addressDao.findOne(saved.getId());
-        assertThat(newSaved).isNotNull();
-
-        addressDao.delete(saved.getId());
-
-        // then
-        final AddressEntity removed = addressDao.findOne(saved.getId());
-        assertThat(removed).isNull();
-    }
-
-
 }

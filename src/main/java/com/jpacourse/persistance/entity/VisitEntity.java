@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "visit")
 public class VisitEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -15,14 +16,35 @@ public class VisitEntity {
 	private LocalDateTime time;
 
 	@ManyToOne
+	@JoinColumn(name = "doctor_id", referencedColumnName = "id")
+	private DoctorEntity doctor;
+
+	@ManyToOne
 	@JoinColumn(name = "patient_id", referencedColumnName = "id")
 	private PatientEntity patient;
 
-	@ManyToOne
-	@JoinColumn(name = "medical_treatment_id", referencedColumnName = "id")
-	private MedicalTreatmentEntity medicalTreatment;
+	@ManyToMany
+	@JoinTable(
+			name = "visit_medical_treatment",
+			joinColumns = @JoinColumn(name = "visit_id"),
+			inverseJoinColumns = @JoinColumn(name = "medical_treatment_id")
+	)
+	private List<MedicalTreatmentEntity> medicalTreatment;
 
-	// Getters and Setters
+	// Новий геттер для PatientMapper
+	public List<MedicalTreatmentEntity> getTreatments() {
+		return medicalTreatment;
+	}
+
+	// Стандартні гетери/сетери
+	public List<MedicalTreatmentEntity> getMedicalTreatment() {
+		return medicalTreatment;
+	}
+
+	public void setMedicalTreatment(List<MedicalTreatmentEntity> medicalTreatment) {
+		this.medicalTreatment = medicalTreatment;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -47,19 +69,19 @@ public class VisitEntity {
 		this.time = time;
 	}
 
+	public DoctorEntity getDoctor() {
+		return doctor;
+	}
+
+	public void setDoctor(DoctorEntity doctor) {
+		this.doctor = doctor;
+	}
+
 	public PatientEntity getPatient() {
 		return patient;
 	}
 
 	public void setPatient(PatientEntity patient) {
 		this.patient = patient;
-	}
-
-	public MedicalTreatmentEntity getMedicalTreatment() {
-		return medicalTreatment;
-	}
-
-	public void setMedicalTreatment(MedicalTreatmentEntity medicalTreatment) {
-		this.medicalTreatment = medicalTreatment;
 	}
 }

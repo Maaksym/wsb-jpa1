@@ -1,29 +1,29 @@
--- Insert into address table (używamy snake_case, zgodnie z wygenerowanym schematem)
-INSERT INTO address (city, address_line1, address_line2, postal_code) VALUES
-('Warszawa', 'Main Street', 'Apartment 1', '00-001'),
-('Kraków', 'Old Town Road', '', '31-001'),
-('Wrocław', 'Freedom Avenue', 'Suite 2', '50-001'),
-('Poznań', 'Green Street', 'Building A', '60-101');
+-- Заповнення таблиці адрес
+INSERT INTO address (address_line1, address_line2, city, postal_code) VALUES
+('123 Elm Street', 'Apt 101', 'Springfield', '12345'),
+('456 Oak Avenue', 'Suite 202', 'Greenwood', '54321');
 
--- Insert into doctor table (przyjmując, że Hibernate konwertuje nazwy pól na snake_case)
-INSERT INTO doctor (first_name, last_name, telephone_number, email, doctor_number, specialization, address_id) VALUES
-('Jan', 'Kowalski', '123456789', 'jan.kowalski@example.com', 'DOC123', 'Cardiology', 1),
-('Anna', 'Nowak', '987654321', 'anna.nowak@example.com', 'DOC124', 'Neurology', 2);
-
--- Insert into patient table
+-- Заповнення таблиці пацієнтів
 INSERT INTO patient (first_name, last_name, telephone_number, email, patient_number, date_of_birth, address_id) VALUES
-('Michał', 'Wiśniewski', '567890123', 'michal.wisniewski@example.com', 'PAT123', '1985-05-20', 1),
-('Agnieszka', 'Zielińska', '678901234', 'agnieszka.zielinska@example.com', 'PAT124', '1990-08-15', 2),
-('Katarzyna', 'Nowicka', '789012345', 'katarzyna.nowicka@example.com', 'PAT125', '1988-02-10', 3);
+('John', 'Doe', '1234567890', 'john.doe@example.com', 'P123', '1985-02-20', 1),
+('Jane', 'Smith', '0987654321', 'jane.smith@example.com', 'P124', '1990-08-15', 2);
 
--- Insert into medical_treatment table
+-- Заповнення таблиці лікарів
+INSERT INTO doctor (first_name, last_name, specialization) VALUES
+('Emily', 'Adams', 'Cardiology'),
+('Mark', 'Brown', 'Orthopedics');
+
+-- Заповнення таблиці медичних процедур
 INSERT INTO medical_treatment (description, type) VALUES
-('Physical Therapy', 'Rehabilitation'),
-('Blood Test', 'Diagnostics'),
-('MRI Scan', 'Imaging');
+('Heart check-up', 'Cardiology'),
+('Knee surgery', 'Orthopedics');
 
--- Insert into visit table
-INSERT INTO visit (description, time, patient_id, medical_treatment_id) VALUES
-('Routine Check-up', '2025-03-20T10:00:00', 1, 2),
-('Follow-up Visit', '2025-03-21T15:00:00', 2, 1),
-('MRI Consultation', '2025-03-22T09:30:00', 3, 3);
+-- Заповнення таблиці візитів
+INSERT INTO visit (description, time, patient_id, doctor_id) VALUES
+('Routine check-up', '2025-04-10 10:00:00', 1, 1),
+('Follow-up consultation', '2025-04-11 14:30:00', 2, 2);
+
+-- Заповнення зв’язків між візитами та медичними процедурами
+INSERT INTO visit_medical_treatment (visit_id, medical_treatment_id) VALUES
+(1, 1),
+(2, 2);

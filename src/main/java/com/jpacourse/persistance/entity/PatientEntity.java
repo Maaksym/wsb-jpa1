@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "patient")
 public class PatientEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -17,10 +18,15 @@ public class PatientEntity {
 	private String email;
 	private String patientNumber;
 	private LocalDate dateOfBirth;
+	private LocalDate dateOfRegistration;
+	private Boolean isInsured; // Нове поле
 
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "address_id", referencedColumnName = "id")
+	@ManyToOne
+	@JoinColumn(name = "address_id")
 	private AddressEntity address;
+
+	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	private List<VisitEntity> visits;
 
 	// Getters and Setters
 	public Long getId() {
@@ -79,11 +85,35 @@ public class PatientEntity {
 		this.dateOfBirth = dateOfBirth;
 	}
 
+	public LocalDate getDateOfRegistration() {
+		return dateOfRegistration;
+	}
+
+	public void setDateOfRegistration(LocalDate dateOfRegistration) {
+		this.dateOfRegistration = dateOfRegistration;
+	}
+
+	public Boolean getIsInsured() {
+		return isInsured;
+	}
+
+	public void setIsInsured(Boolean isInsured) {
+		this.isInsured = isInsured;
+	}
+
 	public AddressEntity getAddress() {
 		return address;
 	}
 
 	public void setAddress(AddressEntity address) {
 		this.address = address;
+	}
+
+	public List<VisitEntity> getVisits() {
+		return visits;
+	}
+
+	public void setVisits(List<VisitEntity> visits) {
+		this.visits = visits;
 	}
 }
