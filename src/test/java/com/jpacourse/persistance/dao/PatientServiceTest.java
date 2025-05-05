@@ -2,14 +2,18 @@ package com.jpacourse.persistance.dao;
 
 import com.jpacourse.service.PatientService;
 import com.jpacourse.dto.PatientTO;
-import com.jpacourse.repository.PatientRepository;
+import com.jpacourse.dto.VisitTO;
+import com.jpacourse.persistance.dao.PatientDao;
 import com.jpacourse.persistance.entity.PatientEntity;
+import com.jpacourse.persistance.entity.VisitEntity;
+import com.jpacourse.repository.PatientRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,71 +25,97 @@ public class PatientServiceTest {
     @Mock
     private PatientRepository patientRepository;
 
+    @Mock
+    private PatientDao patientDao;
+
     @InjectMocks
     private PatientService patientService;
 
-    @Test
-    public void testDeletePatient() {
-        // Мокаємо метод existsById для перевірки, чи існує пацієнт
-        when(patientRepository.existsById(1L)).thenReturn(true);
+    private PatientEntity testPatient;
 
-        // Створюємо тестового пацієнта з порожнім списком візитів
-        PatientEntity testPatient = new PatientEntity();
-        testPatient.setId(1L);
-        testPatient.setVisits(new ArrayList<>());
-
-        // Мокаємо метод findById, щоб повернути тестового пацієнта
-        when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
-
-        // Викликаємо метод видалення пацієнта
-        patientService.deletePatient(1L);
-
-        // Перевіряємо, чи був викликаний метод deleteById
-        verify(patientRepository, times(1)).deleteById(1L);
-
-        // Переконуємося, що список візитів очищений
-        assertTrue(testPatient.getVisits().isEmpty());
-    }
-
-    @Test
-    public void testGetPatientById() {
-        // Створюємо тестового пацієнта з значенням для нового поля isInsured
-        PatientEntity testPatient = new PatientEntity();
+    @BeforeEach
+    public void setUp() {
+        testPatient = new PatientEntity();
         testPatient.setId(1L);
         testPatient.setFirstName("John");
         testPatient.setLastName("Doe");
         testPatient.setIsInsured(true);
+    }
 
-        // Мокаємо метод findById, щоб повернути тестового пацієнта
+    @Test
+    public void testDeletePatient() {
+        when(patientRepository.existsById(1L)).thenReturn(true);
         when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
 
-        // Викликаємо метод отримання пацієнта за ID
+        patientService.deletePatient(1L);
+
+        verify(patientRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testGetPatientById() {
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
+
         PatientTO result = patientService.getPatientById(1L);
 
-        // Перевіряємо, що результат не є null
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
         assertEquals("Doe", result.getLastName());
-        assertTrue(result.getIsInsured()); // Перевірка нового поля
-
-        // Перевіряємо, чи був викликаний метод findById
+        assertTrue(result.getIsInsured());
         verify(patientRepository, times(1)).findById(1L);
     }
 
     @Test
     public void testGetPatientById_NotFound() {
-        // Мокаємо метод findById, щоб повернути порожній результат
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Викликаємо метод і очікуємо RuntimeException
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            patientService.getPatientById(1L);
-        });
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                patientService.getPatientById(1L));
 
-        // Перевіряємо повідомлення винятка
         assertEquals("Пацієнт із ID 1 не знайдений", exception.getMessage());
-
-        // Перевіряємо, чи був викликаний метод findById
         verify(patientRepository, times(1)).findById(1L);
+    }
+
+    /**
+     * 2. Тест JPQL-запиту: Знайти всі візити пацієнта за його ID
+     */
+    @Test
+    public void testFindVisitsByPatientId() {
+        List<VisitEntity> mockVisits = List.of(new VisitEntity());
+        when(patientDao.findVisitsByPatientId(1L)).thenReturn(mockVisits);
+
+        List<VisitTO> result = patientService.findVisitsByPatientId(1L);
+
+        assertFalse(result.isEmpty());
+        verify(patientDao, times(1)).findVisitsByPatientId(1L);
+    }
+
+    /**
+     * 3. Тест JPQL-запиту: Знайти пацієнтів із більше ніж X візитами
+     */
+    @Test
+    public void testFindPatientsWithMoreThanXVisits() {
+        List<PatientEntity> mockPatients = List.of(testPatient);
+        when(patientDao.findPatientsWithMoreThanXVisits(2)).thenReturn(mockPatients);
+
+        List<PatientTO> result = patientService.findPatientsWithMoreThanXVisits(2);
+
+        assertFalse(result.isEmpty());
+        verify(patientDao, times(1)).findPatientsWithMoreThanXVisits(2);
+    }
+
+    /**
+     * 4. Тест JPQL-запиту: Знайти пацієнтів за статусом страхування
+     */
+    @Test
+    public void testFindPatientsByInsuranceStatus() {
+        List<PatientEntity> mockPatients = List.of(testPatient);
+        when(patientDao.findPatientsByInsuranceStatus(true)).thenReturn(mockPatients);
+
+        List<PatientTO> result = patientService.findPatientsByInsuranceStatus(true);
+
+        assertFalse(result.isEmpty());
+        assertTrue(result.get(0).getIsInsured());
+        verify(patientDao, times(1)).findPatientsByInsuranceStatus(true);
     }
 }

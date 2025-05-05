@@ -1,6 +1,8 @@
 package com.jpacourse.persistance.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,14 +21,18 @@ public class PatientEntity {
 	private String patientNumber;
 	private LocalDate dateOfBirth;
 	private LocalDate dateOfRegistration;
-	private Boolean isInsured; // Нове поле
+	private Boolean isInsured;
 
 	@ManyToOne
 	@JoinColumn(name = "address_id")
 	private AddressEntity address;
 
-	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(FetchMode.SELECT) // Спочатку SELECT, потім змінити на JOIN для тестування продуктивності
 	private List<VisitEntity> visits;
+
+	@Version // Включаємо версіонування для Optimistic Lock
+	private Integer version;
 
 	// Getters and Setters
 	public Long getId() {
